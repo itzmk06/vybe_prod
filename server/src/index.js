@@ -8,7 +8,7 @@ const { connectDB } = require("./config/database.js");
 
 const app = express();
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: 145 * 60 * 1000,
   max: 100,
   message: "We received too many requests from this IP, please try again later!",
 });
