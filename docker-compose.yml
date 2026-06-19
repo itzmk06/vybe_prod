@@ -1,0 +1,34 @@
+services:
+    backend:
+        build:
+            context: ./server
+            dockerfile: Dockerfile
+        ports:
+            - "3030:3030"
+        env_file:
+            - "./server/.env"
+        environment:
+            NODE_ENV: production
+            PORT: 3030
+    
+        container_name: backend
+        restart: always
+
+        dns:
+            - 8.8.8.8
+            - 8.8.4.4
+    
+    frontend:
+        build:
+            context: ./client
+            dockerfile: Dockerfile
+        ports:
+            - "5173:4040"
+        depends_on:
+            - backend
+        env_file:
+            - "./client/.env"
+        environment:
+            VITE_SERVER_URL: http://backend:3030
+        container_name: frontend
+        restart: always 
