@@ -14,26 +14,21 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        await refreshAccessToken();
+        await api.post("/refreshToken", {}, { withCredentials: true });
         return api(originalRequest);
       } catch (refreshError) {
         console.error("Session expired!");
-        // ❌ REMOVE: window.location.href = "/";
-        // ✅ Just reject — let the component (ProtectedRoute) handle redirect
         return Promise.reject(refreshError);
       }
+    }
+
+    if (!error.response) {
+      console.error("Network/CORS error:", error.message);
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);
   },
 );
-
-const refreshAccessToken = async () => {
-  try {
-    await api.post("/refreshToken", {}, { withCredentials: true });
-  } catch (error) {
-    throw new Error("Refresh token expired! Redirecting to login...");
-  }
-};
 
 export default api;

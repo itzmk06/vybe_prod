@@ -10,42 +10,60 @@ const app = express();
 const limiter = rateLimit({
   windowMs: 145 * 60 * 1000,
   max: 100,
-  message: "We received too many requests from this IP, please try again later!",
+  message:
+    "We received too many requests from this IP, please try again later!",
 });
 
 app.use(helmet());
 app.use(limiter);
-app.use(express.json());
+app.use(express.json());  
 
-// ✅ FIX: Use FRONTEND_URL from env + hardcoded fallbacks
+// ✅ FIX: Properly build allowed origins
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://vybe-prod.vercel.app',
-  'https://vybe-react.vercel.app',
-  process.env.FRONTEND_URL,  // ← From env, can be anything you set
-].filter(Boolean);  // Remove undefined/null
+  "http://localhost:5173",
+  "https://vybe-prod.vercel.app",
+  "https://vybe-react.vercel.app",
+  "https://vybe-frontend.onrender.com",
+  process.env.FRONTEND_URL,
+];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('CORS blocked origin:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Add FRONTEND_URL from env if it exists and is not already included
+if (
+  process.env.FRONTEND_URL &&
+  !allowedOrigins.includes(process.env.FRONTEND_URL)
+) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+console.log("Allowed CORS origins:", allowedOrigins); // Debug log
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("CORS BLOCKED origin:", origin);
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  }),
+);
+
+// ✅ IMPORTANT: Handle preflight OPTIONS requests explicitly
+app.options("*", cors());
 
 app.use(cookieParser());
 
 // Health check endpoint for UptimeRobot + Render
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 const { authRouter } = require("./routes/authRoutes");
