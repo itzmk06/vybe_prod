@@ -25,8 +25,9 @@ app.use(
 );
 app.use(cookieParser());
 
-app.get("/health", (req, res) => {
-  res.status(200).json({ message: "Healthy" });
+// Health check endpoint for UptimeRobot + Render
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 const { authRouter } = require("./routes/authRoutes");
