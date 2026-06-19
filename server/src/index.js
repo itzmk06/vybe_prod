@@ -8,7 +8,7 @@ const { connectDB } = require("./config/database.js");
 
 const app = express();
 const limiter = rateLimit({
-  windowMs: 145 * 60 * 1000,
+  windowMs: 15 * 60 * 1000,
   max: 100,
   message:
     "We received too many requests from this IP, please try again later!",
@@ -16,9 +16,9 @@ const limiter = rateLimit({
 
 app.use(helmet());
 app.use(limiter);
-app.use(express.json());  
+app.use(express.json());
 
-// ✅ FIX: Properly build allowed origins
+// Allowed origins
 const allowedOrigins = [
   "http://localhost:5173",
   "https://vybe-prod.vercel.app",
@@ -27,7 +27,6 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ];
 
-// Add FRONTEND_URL from env if it exists and is not already included
 if (
   process.env.FRONTEND_URL &&
   !allowedOrigins.includes(process.env.FRONTEND_URL)
@@ -35,14 +34,12 @@ if (
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
 
-console.log("Allowed CORS origins:", allowedOrigins); // Debug log
+console.log("Allowed CORS origins:", allowedOrigins);
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -56,12 +53,11 @@ app.use(
   }),
 );
 
-// ✅ IMPORTANT: Handle preflight OPTIONS requests explicitly
 app.options("*", cors());
 
 app.use(cookieParser());
 
-// Health check endpoint for UptimeRobot + Render
+// Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });

@@ -6,90 +6,162 @@ import PropTypes from "prop-types";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  // Check auth on mount - no manual cookie check!
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const res = await api.get("/user", { withCredentials: true });
-        console.log("Auth check success:", res.data);
-        setUser(res.data.user || res.data.data);
-      } catch (error) {
-        console.log(
-          "Auth check failed:",
-          error.response?.status,
-          error.message,
-        );
-        setUser(null);
-        // ❌ NO navigate here!
-      } finally {
-        setLoading(false);
-      }
+    const navigate = useNavigate();
+
+    // Check authentication status when app loads
+    useEffect(() => {
+
+        const checkAuth = async () => {
+
+            try {
+
+                const res = await api.get("/user");
+
+                console.log("Auth check success:", res.data);
+
+                const userData =
+                    res.data.user ||
+                    res.data.data ||
+                    res.data;
+
+                setUser(userData);
+
+            } catch (error) {
+
+                console.log(
+                    "Auth check failed:",
+                    error.response?.status,
+                    error.message
+                );
+
+                setUser(null);
+
+                // Don't navigate here
+                // Interceptor/Auth flow handles session expiration
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        };
+
+        checkAuth();
+
+    }, []);
+
+
+
+
+    const login = async (email, password) => {
+
+        try {
+
+            const res = await api.post("/login", {
+                emailId: email,
+                password,
+            });
+
+            console.log("Login response:", res.data);
+
+            const userData =
+                res.data.user ||
+                res.data.data ||
+                res.data;
+
+            setUser(userData);
+
+            navigate("/home");
+
+        } catch (error) {
+
+            console.error("Login failed:", error);
+
+            throw new Error(
+                error.response?.data?.message ||
+                "Login failed. Please try again."
+            );
+        }
     };
 
-    checkAuth();
-  }, []);
 
-  const login = async (email, password) => {
-    try {
-      const res = await api.post(
-        "/login",
-        { emailId: email, password },
-        { withCredentials: true },
-      );
-      console.log("Login Response:", res.data);
 
-      // Adjust based on your backend response structure!
-      const userData = res.data.user || res.data.data || res.data;
-      setUser(userData);
 
-      navigate("/home");
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw new Error(
-        error.response?.data?.message || "Login failed. Try again!",
-      );
-    }
-  };
+    const signup = async (userData) => {
 
-  const signup = async (userData) => {
-    try {
-      const res = await api.post("/signup", userData, {
-        withCredentials: true,
-      });
-      console.log("Signup Response:", res.data);
+        try {
 
-      const newUser = res.data.user || res.data.data || res.data;
-      setUser(newUser);
-      navigate("/home");
-    } catch (error) {
-      console.error("Signup failed:", error);
-      throw new Error(
-        error.response?.data?.message || "Signup failed. Try again!",
-      );
-    }
-  };
+            const res = await api.post(
+                "/signup",
+                userData
+            );
 
-  const logout = async () => {
-    try {
-      await api.post("/logout", {}, { withCredentials: true });
-      setUser(null);
-      navigate("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+            console.log("Signup response:", res.data);
 
-  return (
-    <AuthContext.Provider value={{ user, signup, login, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+            const newUser =
+                res.data.user ||
+                res.data.data ||
+                res.data;
+
+            setUser(newUser);
+
+            navigate("/home");
+
+        } catch (error) {
+
+            console.error("Signup failed:", error);
+
+            throw new Error(
+                error.response?.data?.message ||
+                "Signup failed. Please try again."
+            );
+        }
+    };
+
+
+
+
+    const logout = async () => {
+
+        try {
+
+            await api.post("/logout");
+
+        } catch (error) {
+
+            console.error("Logout failed:", error);
+
+        } finally {
+
+            setUser(null);
+
+            navigate("/");
+
+        }
+    };
+
+
+
+
+    return (
+        <AuthContext.Provider
+            value={{
+                user,
+                setUser,
+                loading,
+                login,
+                signup,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 };
 
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+    children: PropTypes.node.isRequired,
 };
