@@ -1,0 +1,5 @@
+__pycache__/
+venv/
+.env
+*.pkl          ← don't push original big files
+.streamlit/secrets.toml
