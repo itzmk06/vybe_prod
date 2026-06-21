@@ -11,20 +11,6 @@ function SideNav() {
   const backdropRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const [recommendUrl, setRecommendUrl] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    const savedUrl = localStorage.getItem("recommendUrl");
-    if (savedUrl) setRecommendUrl(savedUrl);
-  }, []);
-
-  const handleSaveUrl = () => {
-    if (recommendUrl.trim()) {
-      localStorage.setItem("recommendUrl", recommendUrl);
-      setIsEditing(false);
-    }
-  };
 
   useEffect(() => {
     const savedState = localStorage.getItem('sidebarState');
@@ -157,7 +143,7 @@ function SideNav() {
               </div>
             )}
           </Link>
-          
+
           <Link to={'/person'} className={`nav-item ${isActive('/person') ? 'active' : ''}`} onClick={() =>('/person')}>
             <i className="ri-group-fill text-2xl mr-3"></i>
             <span className="nav-text">People</span>
@@ -169,44 +155,19 @@ function SideNav() {
               </div>
             )}
           </Link>
-          
+
+          {/* Fixed AI Recommender Button */}
           <div className="p-2 w-full flex flex-col items-center">
-      {isEditing || !recommendUrl ? (
-        <div className="flex gap-1 w-full max-w-md">
-          <input
-            type="text"
-            placeholder="Enter Recommendation URL"
-            value={recommendUrl}
-            onChange={(e) => setRecommendUrl(e.target.value)}
-            className="border text-black border-gray-300 p-3 w-full rounded-lg focus:ring-4 focus:ring-blue-500 transition-all outline-none shadow-md"
-          />
-          <button
-            onClick={handleSaveUrl}
-            className="bg-green-600 text-white px-5 py-3 rounded-lg hover:bg-green-700 transition-all shadow-md"
-          >
-            Save
-          </button>
-        </div>
-      ) : (
-        <div className="flex items-center gap-3 justify-center">
-          <a
-            href={recommendUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 bg-blue-500 text-white px-3 mt-1 py-2 rounded-lg hover:text-zinc-900 transition-all hover:scale-105"
-          >
-            <i className="fi fi-sr-artificial-intelligence text-2xl"></i>
-            <span className="text-lg font-semibold -mt-1">Recommend</span>
-          </a>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="border border-gray-500 px-4 py-2 rounded-lg  transition-all shadow-sm"
-          >
-            Edit
-          </button>
-        </div>
-      )}
-    </div>
+            <a
+              href="https://jet15fuze-vybe.hf.space/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 bg-blue-500 text-white px-3 mt-1 py-2 rounded-lg hover:text-zinc-900 transition-all hover:scale-105 w-full max-w-[200px]"
+            >
+              <i className="fi fi-sr-artificial-intelligence text-2xl"></i>
+              <span className="text-lg font-semibold -mt-1">Recommend</span>
+            </a>
+          </div>
         </nav>
         <button className='nav-item logout font-bold' onClick={handleLogout}>
           <i className="ri-logout-box-r-line text-2xl mr-3"></i>
