@@ -32,6 +32,4 @@ This is the **combined, dockerized version** of Vybe that bundles Frontend, Back
 
 **Recommendation Engine:** Cosine Similarity (Content-Based Filtering)
 
----
-
 **⭐ Star the repo if you find it useful!**
