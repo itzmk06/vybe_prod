@@ -4,8 +4,6 @@
   <p>Full-Stack • Dockerized • Production Ready</p>
 </div>
 
----
-
 ## 📁 About This Repo
 
 This is the **combined, dockerized version** of Vybe that bundles Frontend, Backend, and ML Engine into a single repository for seamless local development and deployment.
@@ -16,7 +14,6 @@ This is the **combined, dockerized version** of Vybe that bundles Frontend, Back
 
 ## 🌍 Live Deployment
 - **Vybe:** [https://vybe-prod.vercel.app/](https://vybe-prod.vercel.app/)
----
 
 ## 🛠️ Tech Stack
 
