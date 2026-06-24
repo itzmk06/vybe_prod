@@ -1,7 +1,6 @@
 <div align="center">
   <h1>🚀 Vybe 🎬🍿</h1>
   <p><strong>AI-Powered Movie & TV Show Recommendation Platform</strong></p>
-  <p>Full-Stack • Dockerized • Production Ready</p>
 </div>
 
 ## 📁 About This Repo
