@@ -85,3 +85,16 @@ jobs:
           labels: ${{steps.meta.outputs.labels}}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: deploy to render
+        env:
+          WEBHOOK_URL: ${{secrets.RENDER_DEPLOY_WEBHOOK_URL}}
+        run: |
+          echo "Triggering deployment..."
+          curl -x POST $WEBHOOK_URL
+          echo "Deploy triggered successfully!"
