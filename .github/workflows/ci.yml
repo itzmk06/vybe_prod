@@ -93,7 +93,7 @@ jobs:
     steps:
       - name: deploy to render
         env:
-          WEBHOOK_URL: ${{secrets.RENDER_DEPLOY_WEBHOOK_URL}}
+          WEBHOOK_URL: ${{secrets.RENDER_DEPLOY_HOOK_URL}}
         run: |
           echo "Triggering deployment..."
           curl -X POST "$WEBHOOK_URL"
