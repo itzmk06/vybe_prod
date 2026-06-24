@@ -96,5 +96,5 @@ jobs:
           WEBHOOK_URL: ${{secrets.RENDER_DEPLOY_WEBHOOK_URL}}
         run: |
           echo "Triggering deployment..."
-          curl -x POST $WEBHOOK_URL
+          curl -X POST "$WEBHOOK_URL"
           echo "Deploy triggered successfully!"
